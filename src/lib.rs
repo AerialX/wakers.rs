@@ -77,26 +77,31 @@ pub struct SendWakers<W> {
 }
 
 impl<W> SendWakers<W> {
+    #[inline]
     pub fn new(wakers: W) -> Self {
         Self {
             wakers: UnsafeCell::new(wakers),
         }
     }
 
+    #[inline]
     unsafe fn inner(&self) -> &W {
         &*self.wakers.get()
     }
 
+    #[inline]
     unsafe fn inner_mut(&self) -> &mut W {
         &mut *self.wakers.get()
     }
 
+    #[inline]
     pub fn get_mut(&mut self) -> &mut W {
         unsafe {
             self.inner_mut()
         }
     }
 
+    #[inline]
     pub fn into_inner(self) -> W {
         let res = unsafe { ptr::read(self.wakers.get()) };
         mem::forget(self);
@@ -105,12 +110,14 @@ impl<W> SendWakers<W> {
 }
 
 impl<W: fmt::Debug> fmt::Debug for SendWakers<W> {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(unsafe { self.inner() }, f)
     }
 }
 
 impl<W: Clone> Clone for SendWakers<W> {
+    #[inline]
     fn clone(&self) -> Self {
         Self::new(unsafe { self.inner() }.clone())
     }
@@ -126,22 +133,26 @@ impl<W: const_default::ConstDefault> const_default::ConstDefault for SendWakers<
 unsafe impl<W: Send> Send for SendWakers<W> { }
 
 impl<W: WakersMut> WakersMut for SendWakers<W> {
+    #[inline]
     fn pend(&mut self, waker: &Waker) {
         self.get_mut().pend(waker)
     }
 
+    #[inline]
     fn wake(&mut self) {
         self.get_mut().wake()
     }
 }
 
 impl<W: WakersMut> WakersRef for SendWakers<W> {
+    #[inline]
     fn wake_by_ref(&self) {
         unsafe { self.inner_mut() }.wake()
     }
 }
 
 impl<W: WakersMut> Wakers for SendWakers<W> {
+    #[inline]
     fn pend_by_ref(&self, waker: &Waker) {
         unsafe { self.inner_mut() }.pend(waker)
     }
@@ -162,50 +173,59 @@ mod sync_wakers {
     }
 
     impl<W: Clone> Clone for SyncWakers<W> {
+        #[inline]
         fn clone(&self) -> Self {
             Self::new(self.wakers.lock().unwrap().clone())
         }
     }
 
     impl<W: fmt::Debug> fmt::Debug for SyncWakers<W> {
+        #[inline]
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             fmt::Debug::fmt(&self.wakers.lock().unwrap(), f)
         }
     }
 
     impl<W> SyncWakers<W> {
+        #[inline]
         pub fn new(wakers: W) -> Self {
             Self {
                 wakers: Mutex::new(wakers),
             }
         }
 
+        #[inline]
         pub fn get_mut(&mut self) -> &mut W {
             self.wakers.get_mut().unwrap()
         }
 
+        #[inline]
         pub fn into_inner(self) -> W {
             self.wakers.into_inner().unwrap()
         }
     }
 
     impl<W: WakersMut> WakersMut for SyncWakers<W> {
+        #[inline]
         fn pend(&mut self, waker: &Waker) {
             self.get_mut().pend(waker)
         }
 
+        #[inline]
         fn wake(&mut self) {
             self.get_mut().wake()
         }
     }
 
     impl<W: WakersMut> Wakers for SyncWakers<W> {
+        #[inline]
         fn pend_by_ref(&self, waker: &Waker) {
             self.wakers.lock().unwrap().pend(waker)
         }
     }
 
     impl<W: WakersMut> WakersRef for SyncWakers<W> {
+        #[inline]
         fn wake_by_ref(&self) {
             self.wakers.lock().unwrap().wake()
         }

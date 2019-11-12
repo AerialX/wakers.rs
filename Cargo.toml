@@ -1,0 +1,13 @@
+[package]
+name = "wakers"
+version = "0.1.0"
+edition = "2018"
+
+categories = ["no-std", "asynchronous"]
+
+[dependencies]
+const-default = { version = "^0.1.0", git = "https://github.com/AerialX/const-default.rs", optional = true }
+slab = { version = "*", optional = true }
+
+[features]
+std = []

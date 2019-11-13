@@ -56,6 +56,14 @@ impl WakersRef for WakerQueue {
     }
 }
 
+impl WakerQueue {
+    pub const fn new() -> Self {
+        Self {
+            waker: None,
+        }
+    }
+}
+
 #[cfg(feature = "const-default")]
 impl const_default::ConstDefault for WakerQueue {
     const DEFAULT: Self = Self {

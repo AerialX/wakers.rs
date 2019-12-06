@@ -86,7 +86,7 @@ pub struct SendWakers<W> {
 
 impl<W> SendWakers<W> {
     #[inline]
-    pub fn new(wakers: W) -> Self {
+    pub const fn new(wakers: W) -> Self {
         Self {
             wakers: UnsafeCell::new(wakers),
         }
